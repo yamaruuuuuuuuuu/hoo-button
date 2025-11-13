@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ほぉボタン - 発表者</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check-compat.js"></script>
+
+  <style>
+    .hee-stream{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .float-hee{
+      position:absolute;
+      bottom:-12vh;
+      color:rgba(226,232,240,.28);
+      font-weight:800;
+      line-height:1;
+      text-shadow:0 6px 18px rgba(0,0,0,.35);
+      animation: rise var(--dur,6s) linear forwards;
+      will-change:transform,opacity;
+      white-space: nowrap;
+      width: max-content;
+    }
+    @keyframes rise{ 0%{transform:translateY(10vh);opacity:0} 10%{opacity:1} 100%{transform:translateY(-120vh);opacity:0} }
+  </style>
+</head>
+<body>
+  <div class="container" style="position:relative; z-index:1;">
+    <div class="countline">
+      <span id="count" class="count">0</span>
+      <span class="unit">ほぉ</span>
+    </div>
+    <button id="reset" class="btn reset">リセット</button>
+  </div>
+  <div class="hee-stream" id="heeStream" aria-hidden="true"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOza8CYaXX0IktcC8JnxSpt87BDz2ThwI",
+      authDomain: "sample-34a93.firebaseapp.com",
+      databaseURL: "https://sample-34a93-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "sample-34a93",
+      storageBucket: "sample-34a93.firebasestorage.app",
+      messagingSenderId: "1052546536577",
+      appId: "1:1052546536577:web:ddd29c33fadd6f44422980"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const appCheck = firebase.appCheck();
+    appCheck.activate('6Lcl4wksAAAAALL3SEwpjOg9OUZ5Bfa_wDfIeMFv');
+
+    const auth = firebase.auth();
+    const db   = firebase.database();
+    auth.signInAnonymously().catch(console.error);
+
+    const countEl = document.getElementById('count');
+    const ref = db.ref('/count'); let prev = 0;
+    ref.on('value', (snap) => {
+      const v = snap.val() ?? 0;
+      countEl.textContent = v;
+      countEl.classList.remove('spark'); void countEl.offsetWidth; countEl.classList.add('spark');
+      const inc = Math.max(0, v - prev);
+      if (inc > 0) spawnHee(Math.min(inc, 20));
+      prev = v;
+    });
+
+    document.getElementById('reset').addEventListener('click', async () => {
+      await ref.set(0);
+    });
+
+    const stream = document.getElementById('heeStream');
+    function spawnHee(n=1){
+      for(let i=0;i<n;i++){
+        const el = document.createElement('div');
+        el.className = 'float-hee';
+        el.textContent = 'ほぉ';
+        const minFont = 24;
+        const maxFont = Math.min(160, Math.floor(innerHeight*0.22));
+        el.style.fontSize = (minFont + Math.random()*(maxFont-minFont)) + 'px';
+        el.style.left = (5 + Math.random()*85) + 'vw';
+        el.style.setProperty('--dur', (4 + Math.random()*5).toFixed(2) + 's');
+        stream.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+      }
+    }
+  </script>
+</body>
+</html>

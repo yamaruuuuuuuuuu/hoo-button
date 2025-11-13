@@ -1,0 +1,102 @@
+:root {
+  --bg:#0f172a;
+  --fg:#e2e8f0;
+  --accent:#38bdf8;
+  --ok:#22c55e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  background:var(--bg);
+  color:var(--fg);
+  display:grid;
+  place-items:center;
+  min-height:100svh;
+}
+.container{
+  width:min(800px, 94vw);
+  text-align:center;
+}
+.title{
+  font-size: clamp(24px, 3vw, 32px);
+  opacity:.9;
+  margin: 0px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.countline{
+  display:flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: clamp(8px, 1.4vw, 24px);
+  white-space: nowrap;
+  font-size: clamp(64px, 12vw, 160px);
+  line-height: 1;
+  margin-bottom: clamp(50px, 4vw, 80px);
+}
+.count{
+  font-size: clamp(120px, 18vw, 160px);
+  font-weight:800;
+  letter-spacing: .04em;
+}
+.unit{
+  font-weight: 800;
+  opacity: .9;
+  line-height: 1;
+  font-size: clamp(40px, 5vw, 60px);
+  margin-left: 0;
+}
+.btn{
+  display:inline-grid;
+  place-items:center;
+  border-radius:100px;
+  padding: 12px 30px;
+  font-size: clamp(12px, 1.5vw, 16px);
+  border:2px solid transparent; cursor:pointer;
+  user-select:none;
+  transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+
+  /* ★ ダブルタップズーム防止 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active{
+    transform: scale(.98)
+}
+.btn.heee{
+    background: radial-gradient(80% 80% at 50% 20%, var(--accent), #2563eb);
+    color: white;
+    box-shadow: 0 10px 30px rgba(56, 189, 248, .35);
+    font-size: clamp(30px, 3vw, 40px);
+    padding: 26px 100px;
+    font-weight: bold;
+    border: none;
+    transition: .2s ease-in-out;
+}
+.btn.heee:hover{
+  transform: scale(1.07);
+}
+.btn.reset{
+  background:transparent; color:var(--fg);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.badge{
+  display:inline-block;
+  font-size:12px; opacity:.75; margin-top:8px;
+}
+.footer{
+  opacity:.6;
+  font-size:12px;
+  margin-top:20px
+}
+.spark{
+  animation: pop .4s ease;
+}
+@keyframes pop{
+  0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)}
+}
+
+/* ★ ページ全体で意図しないズームを防止 */
+html, body {
+  touch-action: pan-x pan-y;
+}

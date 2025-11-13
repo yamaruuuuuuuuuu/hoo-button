@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ほぉボタン - 参加者</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="countline">
+        <span id="count" class="count">0</span>
+        <span class="unit">ほぉ</span>
+      </div>
+    <button id="hee" class="btn heee">ほぉ〜</button>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOza8CYaXX0IktcC8JnxSpt87BDz2ThwI",
+      authDomain: "sample-34a93.firebaseapp.com",
+      databaseURL: "https://sample-34a93-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "sample-34a93",
+      storageBucket: "sample-34a93.firebasestorage.app",
+      messagingSenderId: "1052546536577",
+      appId: "1:1052546536577:web:ddd29c33fadd6f44422980"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const appCheck = firebase.appCheck();
+    appCheck.activate('6Lcl4wksAAAAALL3SEwpjOg9OUZ5Bfa_wDfIeMFv');
+
+    const auth = firebase.auth();
+    const db   = firebase.database();
+
+    auth.signInAnonymously().catch(console.error);
+
+    const ref = db.ref('/count');
+    const countEl = document.getElementById('count');
+
+    ref.on('value', (snap) => {
+      const v = snap.val() ?? 0;
+      countEl.textContent = v;
+      countEl.classList.remove('spark'); void countEl.offsetWidth; countEl.classList.add('spark');
+    });
+
+    document.getElementById('hee').addEventListener('click', async () => {
+      await ref.transaction((cur) => (cur || 0) + 1);
+    });
+  </script>
+</body>
+</html>
