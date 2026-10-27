@@ -5,19 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ほぉボタン - 参加者</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&display=swap" />
   <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check-compat.js"></script>
+
+  <style>
+    body.audience{
+      background: #dfe8f7 url("./images/bg.png") center / cover no-repeat fixed;
+      color: #1e3a8a;
+      place-items: start center;
+      overflow: hidden;
+    }
+    .audience .container{
+      padding-top: clamp(40px, 10svh, 120px);
+    }
+    /* カウント表示：白のオーバーレイ */
+    .audience .countline{
+      font-family: 'M PLUS Rounded 1c', system-ui, sans-serif;
+      gap: clamp(6px, 1vw, 14px);
+    }
+    .audience .count,
+    .audience .unit{
+      color: #fff;
+      text-shadow:
+        0 0 1px rgba(30,64,175,.35),
+        0 1px 0 rgba(147,197,253,.6),
+        0 3px 8px rgba(30,64,175,.15),
+        0 8px 24px rgba(30,64,175,.12);
+    }
+    .audience .count{
+      font-weight: 800;
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .audience .unit{
+      font-weight: 800;
+      opacity: 1;
+      position: relative;
+      top: -8px; /* 数字のベースラインに揃える */
+    }
+    /* 画像ボタン：画面中央下部 */
+    .hoo-btn{
+      position: fixed;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: min(420px, 80vw);
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* 土台・青いキャップ・手前のリングの3枚を重ねる */
+    .hoo-stack{
+      position: relative;
+      display: block;
+      aspect-ratio: 500 / 333;
+      filter: drop-shadow(0 18px 18px rgba(30,58,138,.35));
+    }
+    .hoo-stack img{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+    .hoo-cap{
+      transition: transform .22s cubic-bezier(.3,1.8,.5,1), filter .35s ease;
+    }
+    /* 背面の光 */
+    .hoo-glow{
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      width: 95%;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.6);
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(125,211,252,.95), rgba(56,189,248,.55) 40%, rgba(37,99,235,0) 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    .hoo-btn:hover .hoo-cap{
+      filter: brightness(1.06);
+    }
+    /* 押し込み：青い部分だけ沈んで光る */
+    .hoo-btn.is-pressed .hoo-cap,
+    .hoo-btn:active .hoo-cap{
+      transform: translateY(3.6%);
+      filter: brightness(1.45) saturate(1.2) drop-shadow(0 0 14px rgba(125,211,252,.95));
+      transition: transform .05s ease-out, filter .05s ease-out;
+    }
+    .hoo-btn.is-pressed .hoo-glow,
+    .hoo-btn:active .hoo-glow{
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      transition: opacity .05s ease-out, transform .12s ease-out;
+    }
+    /* 離した後の余韻 */
+    .hoo-btn.flash .hoo-glow{
+      animation: hoo-flash .6s ease-out;
+    }
+    @keyframes hoo-flash{
+      0%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100%{ opacity: 0; transform: translate(-50%, -50%) scale(1.1); }
+    }
+    .hoo-btn:focus-visible{
+      outline: 3px solid #2563eb;
+      outline-offset: 6px;
+      border-radius: 24px;
+    }
+  </style>
 </head>
-<body>
+<body class="audience">
   <div class="container">
     <div class="countline">
         <span id="count" class="count">0</span>
         <span class="unit">ほぉ</span>
       </div>
-    <button id="hee" class="btn heee">ほぉ〜</button>
   </div>
+  <button id="hee" class="hoo-btn" aria-label="ほぉ〜">
+    <span class="hoo-glow"></span>
+    <span class="hoo-stack">
+      <img src="./images/button-base.png" alt="" draggable="false" />
+      <img src="./images/button-cap.png" class="hoo-cap" alt="" draggable="false" />
+      <img src="./images/button-front.png" alt="" draggable="false" />
+    </span>
+  </button>
 
   <script>
     const firebaseConfig = {
@@ -49,7 +173,25 @@
       countEl.classList.remove('spark'); void countEl.offsetWidth; countEl.classList.add('spark');
     });
 
-    document.getElementById('hee').addEventListener('click', async () => {
+    const heeBtn = document.getElementById('hee');
+
+    // タッチ端末でも即座に押し込み表示する
+    const press   = () => heeBtn.classList.add('is-pressed');
+    const release = () => {
+      if (!heeBtn.classList.contains('is-pressed')) return;
+      heeBtn.classList.remove('is-pressed');
+      heeBtn.classList.remove('flash'); void heeBtn.offsetWidth; heeBtn.classList.add('flash');
+    };
+    heeBtn.addEventListener('pointerdown', (e) => {
+      press();
+      heeBtn.setPointerCapture?.(e.pointerId);
+      navigator.vibrate?.(10);
+    });
+    heeBtn.addEventListener('pointerup', release);
+    heeBtn.addEventListener('pointercancel', release);
+    heeBtn.addEventListener('lostpointercapture', release);
+
+    heeBtn.addEventListener('click', async () => {
       await ref.transaction((cur) => (cur || 0) + 1);
     });
   </script>
