@@ -20,8 +20,24 @@
       place-items: start center;
       overflow: hidden;
     }
+    body.audience{
+      --btn-w: min(420px, 80vw);
+      --btn-h: calc(var(--btn-w) * 333 / 500);
+      --btn-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+    /* ボタンより上の余白の上下中央に数字を置く */
     .audience .container{
-      padding-top: clamp(40px, 10svh, 120px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--btn-h) + var(--btn-bottom));
+      width: auto;
+      display: grid;
+      place-items: center;
+    }
+    .audience .countline{
+      margin-bottom: 0;
     }
     /* カウント表示：白のオーバーレイ */
     .audience .countline{
@@ -52,9 +68,9 @@
     .hoo-btn{
       position: fixed;
       left: 50%;
-      bottom: max(24px, env(safe-area-inset-bottom));
+      bottom: var(--btn-bottom);
       transform: translateX(-50%);
-      width: min(420px, 80vw);
+      width: var(--btn-w);
       padding: 0;
       border: none;
       background: none;
